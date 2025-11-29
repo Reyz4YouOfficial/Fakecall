@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>FakeCall Generator</title>
+<style>
+body{
+  background:#111;
+  color:#fff;
+  font-family: Arial, sans-serif;
+  text-align:center;
+  padding:20px;
+}
+input, button {
+  width: 90%;
+  padding:10px;
+  margin:6px;
+  background:#1f1f1f;
+  border:1px solid #333;
+  border-radius: 8px;
+  color:white;
+}
+button {
+  background:#00a884;
+  cursor:pointer;
+  font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h2>FakeCall Generator</h2>
+
+<input type="text" id="nama" placeholder="Nama Caller (misal: Sayang)">
+<input type="text" id="durasi" placeholder="Durasi (misal: 00:08)">
+<input type="file" id="avatar" accept="image/*">
+
+<button onclick="generate()">Generate FakeCall</button>
+
+<canvas id="canvas" width="720" height="1280" style="display:none;"></canvas>
+
+<script>
+async function generate() {
+  const nama = document.getElementById("nama").value || "Unknown";
+  const durasi = document.getElementById("durasi").value || "00:00";
+  const file = document.getElementById("avatar").files[0];
+
+  if(!file){
+    alert("Upload foto dulu!");
+    return;
+  }
+
+  const avatarURL = await fileToUrl(file);
+
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const bg = await loadImg("https://files.catbox.moe/pmhptv.jpg");
+  ctx.drawImage(bg, 0, 0, 720, 1280);
+
+  // Nama
+  ctx.font = "bold 65px sans-serif";
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.fillText(nama, 360, 200);
+
+  // Durasi
+  ctx.font = "48px sans-serif";
+  ctx.fillStyle = "#d1d1d1";
+  ctx.fillText(durasi, 360, 270);
+
+  // Foto profil ukuran WhatsApp
+  const avatarImg = await loadImg(avatarURL);
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(360, 640, 150, 0, Math.PI * 2); // radius 150px (WA size)
+  ctx.clip();
+  ctx.drawImage(avatarImg, 210, 490, 300, 300); // diameter 300px
+  ctx.restore();
+
+  // Copyright By Kenzxx Cakepp
+  ctx.font = "28px sans-serif";
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.fillText("", 360, 1260);
+
+  // Konversi ke dataURL
+  const dataURL = canvas.toDataURL("image/jpeg", 0.95);
+
+  // Simpan untuk halaman hasil
+  localStorage.setItem("fakecall_image", dataURL);
+
+  // Pindah ke halaman hasil
+  window.location.href = "hasil.html";
+}
+
+function loadImg(src){
+  return new Promise(res=>{
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = ()=>res(img);
+    img.src = src;
+  });
+}
+
+function fileToUrl(file){
+  return new Promise(res=>{
+    const r = new FileReader();
+    r.onload = ()=>res(r.result);
+    r.readAsDataURL(file);
+  });
+}
+</script>
+
+</body>
+</html>
