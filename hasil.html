@@ -1,0 +1,70 @@
+//Minimal Mandi Biar Cakep Kaya Kenzx
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Hasil FakeCall</title>
+<style>
+body {
+    background:#000;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    gap:20px;
+}
+img{
+    width:360px;
+    border-radius:15px;
+}
+button {
+    width:200px;
+    padding:12px;
+    background:#00a884;
+    border:none;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    border-radius:10px;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<img id="hasil">
+
+<button onclick="downloadImage()">Download</button>
+<button onclick="window.location.href='index.html'">Generate Lagi</button>
+
+<script>
+const img = localStorage.getItem("fakecall_image");
+
+if(img){
+    document.getElementById("hasil").src = img;
+}else{
+    document.body.innerHTML = "<h2 style='color:white;'>Tidak ada gambar ditemukan.</h2>";
+}
+
+function downloadImage() {
+    const dataURL = localStorage.getItem("fakecall_image");
+
+    fetch(dataURL)
+        .then(res => res.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "fakecall.jpg";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+}
+</script>
+
+</body>
+</html>
